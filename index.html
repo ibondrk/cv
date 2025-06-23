@@ -163,8 +163,8 @@
           </div>
         </div>
 
-        <div class="section skills">
-          <div class="accordion-toggle" onclick="toggleAccordion(this)">
+        <div class="section skills" data-show-more-wrapper>
+          <div class="accordion-toggle" data-show-more-btn>
             <h3>Skills</h3>
 
             <svg
@@ -174,7 +174,7 @@
               width="16"
               height="16"
               fill="none"
-              data-show-more-text>
+              data-show-more-icon>
               <path
                 stroke="currentColor"
                 stroke-linecap="round"
@@ -235,8 +235,8 @@
           </div>
         </div>
 
-        <div class="section education">
-          <div class="accordion-toggle" onclick="toggleAccordion(this)">
+        <div class="section education" data-show-more-wrapper>
+          <div class="accordion-toggle" data-show-more-btn>
             <h3>Education</h3>
 
             <svg
@@ -246,7 +246,7 @@
               width="16"
               height="16"
               fill="none"
-              data-show-more-text>
+              data-show-more-icon>
               <path
                 stroke="currentColor"
                 stroke-linecap="round"
@@ -429,53 +429,83 @@
 </html>
 
 <script>
-  function toggleAccordion(trigger) {
-    if (window.innerWidth > 1023) return;
+  function toggleAccordionItem(wrapper) {
+    return function () {
+      const trigger = wrapper.querySelector("[data-show-more-btn]");
+      const icon = wrapper.querySelector("[data-show-more-icon]");
+      const content = wrapper.querySelector("[data-show-more-container]");
 
-    const content = trigger.nextElementSibling;
-    const icon = trigger.querySelector("[data-show-more-text]");
+      if (window.innerWidth > 1023) return;
 
-    trigger.classList.toggle("open");
-    if (icon) icon.classList.toggle("open");
+      const isOpen = wrapper.classList.contains("opened");
 
-    if (content) {
-      content.classList.toggle("open");
-
-      if (content.classList.contains("open")) {
+      if (isOpen) {
+        wrapper.classList.remove("opened");
+        if (icon) icon.classList.remove("open");
+        content.style.maxHeight = 0;
+        content.style.opacity = 0;
+      } else {
+        wrapper.classList.add("opened");
+        if (icon) icon.classList.add("open");
         content.style.maxHeight = content.scrollHeight + "px";
         content.style.opacity = 1;
-      } else {
-        content.style.maxHeight = 0;
-        content.style.opacity = 0;
       }
-    }
+    };
   }
+
+  function setupAccordions() {
+    document.querySelectorAll("[data-show-more-wrapper]").forEach((wrapper) => {
+      const trigger = wrapper.querySelector("[data-show-more-btn]");
+      if (trigger) {
+        trigger.addEventListener("click", toggleAccordionItem(wrapper));
+      }
+    });
+  }
+
+  let previousWidth = window.innerWidth;
 
   function handleAccordionState() {
-    const toggles = document.querySelectorAll(".accordion-toggle");
-    const contents = document.querySelectorAll("[data-show-more-container]");
-    const icons = document.querySelectorAll("[data-show-more-text]");
+    const wrappers = document.querySelectorAll("[data-show-more-wrapper]");
+    const currentWidth = window.innerWidth;
 
-    if (window.innerWidth > 1023) {
-      toggles.forEach((toggle) => toggle.classList.add("open"));
-      icons.forEach((icon) => icon.classList.remove("open"));
-      contents.forEach((content) => {
-        content.classList.add("open");
-        content.style.maxHeight = "none";
-        content.style.opacity = 1;
+    if (
+      (previousWidth <= 1023 && currentWidth <= 1023) ||
+      (previousWidth > 1023 && currentWidth > 1023)
+    ) {
+      return;
+    }
+
+    previousWidth = currentWidth;
+
+    if (currentWidth > 1023) {
+      wrappers.forEach((wrapper) => {
+        const content = wrapper.querySelector("[data-show-more-container]");
+        const icon = wrapper.querySelector("[data-show-more-icon]");
+        wrapper.classList.add("opened");
+        if (icon) icon.classList.remove("open");
+        if (content) {
+          content.style.maxHeight = "none";
+          content.style.opacity = 1;
+        }
       });
     } else {
-      toggles.forEach((toggle) => toggle.classList.remove("open"));
-      icons.forEach((icon) => icon.classList.remove("open"));
-      contents.forEach((content) => {
-        content.classList.remove("open");
-        content.style.maxHeight = 0;
-        content.style.opacity = 0;
+      wrappers.forEach((wrapper) => {
+        const content = wrapper.querySelector("[data-show-more-container]");
+        const icon = wrapper.querySelector("[data-show-more-icon]");
+        wrapper.classList.remove("opened");
+        if (icon) icon.classList.remove("open");
+        if (content) {
+          content.style.maxHeight = 0;
+          content.style.opacity = 0;
+        }
       });
     }
   }
 
-  window.addEventListener("DOMContentLoaded", handleAccordionState);
+  window.addEventListener("DOMContentLoaded", () => {
+    setupAccordions();
+    handleAccordionState();
+  });
 
   window.addEventListener("resize", handleAccordionState);
 </script>

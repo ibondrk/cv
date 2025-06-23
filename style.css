@@ -127,6 +127,13 @@ h3 {
   display: none;
 }
 
+.rest_contact_info,
+.contact_wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
 /* Responsive Styles */
 @media (max-width: 1023px) {
   .container {
@@ -186,7 +193,6 @@ h3 {
     flex-direction: row-reverse;
     justify-content: space-between;
     gap: 1rem;
-    flex-wrap: wrap;
   }
 
   .rest_contact_info {
@@ -236,4 +242,35 @@ h3 {
   }
 
   /* Accordion End */
+}
+
+@media print {
+  .accordion-content {
+    max-height: none !important;
+    opacity: 1 !important;
+    display: block !important;
+  }
+
+  .accordion-toggle {
+    display: none;
+  }
+
+  .show_more_icon {
+    display: none !important;
+  }
+
+  .container {
+    flex-direction: row !important;
+    padding: 2rem !important;
+  }
+
+  .left,
+  .right {
+    width: 50% !important;
+    padding: 1rem !important;
+  }
+
+  body {
+    font-size: 12pt;
+  }
 }
